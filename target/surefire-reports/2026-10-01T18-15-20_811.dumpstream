@@ -1,0 +1,5 @@
+# Created at 2026-10-01T18:15:21.060
+Boot Manifest-JAR contains absolute paths in classpath 'E:\microsevices\workflow-abstraction-service\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: temporal-postgres
+    environment:
+      POSTGRES_DB: temporal
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+    ports:
+      - "5432:5432"
+    volumes:
+      - temporal-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal -d temporal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - workflow-net
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    container_name: temporal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_SEEDS: postgres
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_DB: temporal
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    networks:
+      - workflow-net
+
+  batch-service:
+    image: nginx:alpine
+    container_name: batch-service
+    ports:
+      - "8081:80"
+    networks:
+      - workflow-net
+
+  workflow-abstraction-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: workflow-abstraction-service
+    env_file:
+      - .env
+    environment:
+      SERVER_PORT: 8080
+      TEMPORAL_TARGET: temporal:7233
+      TEMPORAL_NAMESPACE: default
+      TEMPORAL_TASK_QUEUE: CSV_BATCH_TASK_QUEUE
+      BATCH_SERVICE_URL: http://batch-service:8081
+    ports:
+      - "8080:8080"
+    depends_on:
+      - temporal
+      - batch-service
+    networks:
+      - workflow-net
+
+volumes:
+  temporal-postgres-data:
+
+networks:
+  workflow-net:
+    driver: bridge

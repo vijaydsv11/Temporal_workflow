@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: workflow-abstraction-service
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.example.workflow: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%logger{36}] %msg%n"
+
+workflow:
+  temporal:
+    target: ${TEMPORAL_TARGET:temporal:7233}
+    namespace: ${TEMPORAL_NAMESPACE:default}
+    task-queue: ${TEMPORAL_TASK_QUEUE:CSV_BATCH_TASK_QUEUE}
+  external:
+    base-url: ${BATCH_SERVICE_URL:http://batch-service:8081}
