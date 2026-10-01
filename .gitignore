@@ -1,0 +1,24 @@
+# Build outputs
+/target/
+*/target/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Maven wrapper / generated metadata
+.mvn/
